@@ -62,7 +62,7 @@ _EOF
 
 %files
 %doc README.md VERSIONS.txt
-%license LICENSE.txt
+%license LICENSE.md
 
 # Necessary directories ownership (to remove them correctly when uninstalling):
 %dir %{_datadir}/adobe
