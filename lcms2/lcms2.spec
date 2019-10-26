@@ -4,7 +4,7 @@ Release:        6%{?dist}
 Summary:        Color Management Engine
 License:        MIT
 URL:            http://www.littlecms.com/
-Source0:        https://github.com/mm2/Little-CMS/archive/lcms%{version}.tar.gz
+Source0:        https://sourceforge.net/projects/lcms/files/lcms/%{version}/lcms2-%{version}.tar.gz
 
 ## upstream patches
 Patch17: 0017-Upgrade-Visual-studio-2017-15.8.patch
