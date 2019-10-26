@@ -35,7 +35,7 @@ Provides:       littlecms-devel = %{version}-%{release}
 Development files for LittleCMS.
 
 %prep
-%autosetup -p1 -n Little-CMS-lcms%{version}
+%autosetup -p1
 
 
 %build
