@@ -27,7 +27,7 @@
 #       tarballs, and their release tags/branches do not use the dot in version
 #       tag. This makes obtaining the current version harder, and might prevent
 #       automatic builds of new releases...
-%global version_short   950
+%global version_short   %(echo "%{version}" | tr -d '.')
 
 # Starting version of new sup-package layout scheme for Ghostscript, which is
 # conflicting with the previous sup-package layout scheme.
