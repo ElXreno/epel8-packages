@@ -9,8 +9,8 @@ Version: 2.0.14
 Release: 9%{?dist}
 
 License: JasPer
-URL:     http://www.ece.uvic.ca/~frodo/jasper/
-Source0: http://www.ece.uvic.ca/~frodo/jasper/software/jasper-%{version}.tar.gz
+URL:     https://www.ece.uvic.ca/~frodo/jasper/
+Source0: https://www.ece.uvic.ca/~frodo/jasper/software/jasper-%{version}.tar.gz
 
 Patch1: jasper-2.0.14-CVE-2016-9396.patch
 # skip hard-coded prefix/lib rpath
