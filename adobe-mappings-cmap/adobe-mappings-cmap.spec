@@ -71,7 +71,7 @@ _EOF
 
 %{_datadir}/adobe/resources/mapping/CNS1
 %{_datadir}/adobe/resources/mapping/GB1
-%{_datadir}/adobe/resources/mapping/KB
+%{_datadir}/adobe/resources/mapping/KR
 %{_datadir}/adobe/resources/mapping/Identity
 %{_datadir}/adobe/resources/mapping/Japan1
 %{_datadir}/adobe/resources/mapping/Korea1
