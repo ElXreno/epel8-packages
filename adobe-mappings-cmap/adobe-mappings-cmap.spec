@@ -1,7 +1,7 @@
 Name:             adobe-mappings-cmap
 Summary:          CMap resources for Adobe's character collections
-Version:          20171205
-Release:          6%{?dist}
+Version:          20190730
+Release:          1%{?dist}
 License:          BSD
 
 URL:              https://www.adobe.com/
@@ -84,6 +84,9 @@ _EOF
 # =============================================================================
 
 %changelog
+* Sat Oct 26 2019 ElXreno <elxreno@gmail.com> - 20190730-1
+- Bumped to 20190730 version
+
 * Wed Jul 24 2019 Fedora Release Engineering <releng@fedoraproject.org> - 20171205-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
 
