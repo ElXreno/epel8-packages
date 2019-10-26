@@ -93,9 +93,9 @@ BuildRequires:    libXt-devel
 # Upstream patches -- official upstream patches released by upstream since the
 # ----------------    last rebase that are necessary for any reason:
 #Patch000: example000.patch
-#Patch000: ghostscript-cve-2019-10216.patch
-#Patch001: ghostscript-cve-2019-14811-14812-14813.patch
-#Patch002: ghostscript-cve-2019-14817.patch
+Patch000: ghostscript-cve-2019-10216.patch
+Patch001: ghostscript-cve-2019-14811-14812-14813.patch
+Patch002: ghostscript-cve-2019-14817.patch
 
 
 # Downstream patches -- these should be always included when doing rebase:
