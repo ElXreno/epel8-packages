@@ -100,7 +100,7 @@ Patch002: ghostscript-cve-2019-14817.patch
 
 # Downstream patches -- these should be always included when doing rebase:
 # ------------------
-#Patch100: ghostscript-9.23-100-run-dvipdf-securely.patch
+Patch100: ghostscript-9.23-100-run-dvipdf-securely.patch
 
 
 # Downstream patches for RHEL -- patches that we keep only in RHEL for various
