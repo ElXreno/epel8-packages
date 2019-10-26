@@ -42,7 +42,7 @@
 
 Name:             ghostscript
 Summary:          Interpreter for PostScript language & PDF
-Version:          9.27
+Version:          9.50
 Release:          1%{?dist}
 
 License:          AGPLv3+
