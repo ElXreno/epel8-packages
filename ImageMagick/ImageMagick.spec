@@ -325,6 +325,9 @@ rm PerlMagick/demo/Generic.ttf
 %doc PerlMagick/demo/ PerlMagick/Changelog PerlMagick/README.txt
 
 %changelog
+* Sun Oct 27 2019 ElXreno <elxreno@gmail.com> - 1:6.9.10.69-1
+- Update to 6.9.10.69 version
+
 * Fri Oct 04 2019 Pete Walter <pwalter@fedoraproject.org> - 1:6.9.10.67-1
 - Update to 6.9.10.67
 
