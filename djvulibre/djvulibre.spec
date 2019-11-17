@@ -3,12 +3,16 @@
 Summary: DjVu viewers, encoders, and utilities
 Name: djvulibre
 Version: 3.5.27
-Release: 12%{?dist}
+Release: 16%{?dist}
 License: GPLv2+
 URL: http://djvu.sourceforge.net/
-Source0: https://downloads.sourceforge.net/djvu/%{name}-%{version}.tar.gz
+Source0: http://downloads.sourceforge.net/djvu/%{name}-%{version}.tar.gz
 Patch0: djvulibre-3.5.22-cdefs.patch
 #Patch1: djvulibre-3.5.25.3-cflags.patch
+Patch2: djvulibre-3.5.27-buffer-overflow.patch
+Patch3: djvulibre-3.5.27-infinite-loop.patch
+Patch4: djvulibre-3.5.27-stack-overflow.patch
+Patch5: djvulibre-3.5.27-zero-bytes-check.patch
 
 Requires(post): xdg-utils
 Requires(preun): xdg-utils
@@ -61,6 +65,10 @@ Development files for DjVuLibre.
 %setup -q 
 %patch0 -p1 -b .cdefs
 #%patch1 -p1 -b .cflags
+%patch2 -p1 -b .buffer-overflow
+%patch3 -p1 -b .infinite-loop
+%patch4 -p1 -b .stack-overflow
+%patch5 -p1 -b .zero-bytes-check
 
 
 %build 
@@ -168,6 +176,22 @@ fi
 
 
 %changelog
+* Thu Nov  7 2019 Marek Kasik <mkasik@redhat.com> - 3.5.27-16
+- Fix a crash due to missing zero-bytes check
+- Resolves: #1767921
+
+* Thu Nov  7 2019 Marek Kasik <mkasik@redhat.com> - 3.5.27-15
+- Fix a stack overflow
+- Resolves: #1767868
+
+* Wed Nov  6 2019 Marek Kasik <mkasik@redhat.com> - 3.5.27-14
+- Break an infinite loop
+- Resolves: #1767857
+
+* Wed Nov  6 2019 Marek Kasik <mkasik@redhat.com> - 3.5.27-13
+- Fix a buffer overflow
+- Resolves: #1767842
+
 * Wed Jul 24 2019 Fedora Release Engineering <releng@fedoraproject.org> - 3.5.27-12
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
 
