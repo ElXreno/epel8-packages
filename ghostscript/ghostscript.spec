@@ -27,7 +27,7 @@
 #       tarballs, and their release tags/branches do not use the dot in version
 #       tag. This makes obtaining the current version harder, and might prevent
 #       automatic builds of new releases...
-%global version_short   927
+%global version_short   %(echo "%{version}" | tr -d '.')
 
 # Starting version of new sup-package layout scheme for Ghostscript, which is
 # conflicting with the previous sup-package layout scheme.
@@ -43,7 +43,7 @@
 Name:             ghostscript
 Summary:          Interpreter for PostScript language & PDF
 Version:          9.27
-Release:          1%{?dist}
+Release:          2%{?dist}
 
 License:          AGPLv3+
 
@@ -96,6 +96,7 @@ BuildRequires:    libXt-devel
 Patch000: ghostscript-cve-2019-10216.patch
 Patch001: ghostscript-cve-2019-14811-14812-14813.patch
 Patch002: ghostscript-cve-2019-14817.patch
+Patch003: ghostscript-cve-2019-14869.patch
 
 
 # Downstream patches -- these should be always included when doing rebase:
@@ -461,6 +462,9 @@ done
 # =============================================================================
 
 %changelog
+* Thu Nov 14 2019 Zdenek Dohnal <zdohnal@redhat.com> - 9.27-2
+- 1772486 - ghostscript: -dSAFER escape in .charkeys (701841)
+
 * Fri Sep 06 2019 Martin Osvald <mosvald@redhat.com> - 9.27-1
 - rebase to latest upstream version 9.27
 - security fixes added for:
