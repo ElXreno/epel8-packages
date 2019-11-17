@@ -1,5 +1,5 @@
 # This spec file has been automatically updated
-Version:        205.1
+Version:        207
 Release: 1%{?dist}
 #
 # This file is maintained at the following location:
@@ -72,7 +72,7 @@ BuildRequires: autoconf automake
 BuildRequires: /usr/bin/python3
 BuildRequires: gettext >= 0.19.7
 %if %{defined build_dashboard}
-BuildRequires: libssh-devel >= 0.7.1
+BuildRequires: libssh-devel >= 0.8
 %endif
 BuildRequires: openssl-devel
 BuildRequires: gnutls-devel >= 3.4.3
@@ -360,7 +360,7 @@ Provides: cockpit-users = %{version}-%{release}
 %if 0%{?rhel}
 Provides: cockpit-networkmanager = %{version}-%{release}
 Obsoletes: cockpit-networkmanager
-Requires: NetworkManager
+Requires: NetworkManager >= 1.6
 Provides: cockpit-kdump = %{version}-%{release}
 Requires: kexec-tools
 Recommends: polkit
@@ -417,12 +417,16 @@ The Cockpit Web Service listens on the network, and authenticates users.
 %{_unitdir}/cockpit-wsinstance-http.service
 %{_unitdir}/cockpit-wsinstance-http-redirect.socket
 %{_unitdir}/cockpit-wsinstance-http-redirect.service
-%{_unitdir}/cockpit-wsinstance-https.socket
-%{_unitdir}/cockpit-wsinstance-https.service
+%{_unitdir}/cockpit-wsinstance-https-factory.socket
+%{_unitdir}/cockpit-wsinstance-https-factory@.service
+%{_unitdir}/cockpit-wsinstance-https@.socket
+%{_unitdir}/cockpit-wsinstance-https@.service
+%{_unitdir}/system-cockpithttps.slice
 %{_prefix}/%{__lib}/tmpfiles.d/cockpit-tempfiles.conf
 %{_sbindir}/remotectl
 %{_libdir}/security/pam_ssh_add.so
 %{_libexecdir}/cockpit-ws
+%{_libexecdir}/cockpit-wsinstance-factory
 %{_libexecdir}/cockpit-tls
 %{_libexecdir}/cockpit-desktop
 %attr(4750, root, cockpit-wsinstance) %{_libexecdir}/cockpit-session
@@ -466,6 +470,12 @@ EOF
     semodule -i $tmp/local.pp
     rm -rf "$tmp"
 fi
+%endif
+%if 0%{?rhel} || 0%{?fedora}
+# HACK: SELinux policy adjustment for cockpit-tls; see https://github.com/fedora-selinux/selinux-policy-contrib/pull/161
+    echo "Applying SELinux policy change for cockpit-wsinstance-factory..."
+    semanage fcontext -a /usr/libexec/cockpit-wsinstance-factory -t cockpit_ws_exec_t
+    restorecon /usr/libexec/cockpit-wsinstance-factory
 %endif
 
 %preun ws
@@ -512,7 +522,7 @@ sosreport tool.
 Summary: Cockpit user interface for networking, using NetworkManager
 Requires: cockpit-bridge >= 186
 Requires: cockpit-shell >= 186
-Requires: NetworkManager
+Requires: NetworkManager >= 1.6
 # Optional components
 Recommends: NetworkManager-team
 BuildArch: noarch
@@ -676,6 +686,18 @@ via PackageKit.
 
 # The changelog is automatically generated and merged
 %changelog
+* Wed Nov 13 2019 Katerina Koukiou <kkoukiou@redhat.com> - 207-1
+
+- Web server: Accept EC certificates
+- Storage: List all software devices in a single panel
+- Redesigned notifications
+
+* Wed Oct 30 2019 Sanne Raymaekers <sanne.raymaekers@gmail.com> - 206-1
+
+- Machines: Network interface deletion
+- login: Enable administration mode by default
+- Firewall: Prevent accidental deletion
+
 * Thu Oct 17 2019 Martin Pitt <mpitt@redhat.com> - 205.1-1
 
 - Fix web server slowness/crash bugs with TLS connections
