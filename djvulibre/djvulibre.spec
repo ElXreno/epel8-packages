@@ -6,7 +6,7 @@ Version: 3.5.27
 Release: 16%{?dist}
 License: GPLv2+
 URL: http://djvu.sourceforge.net/
-Source0: http://downloads.sourceforge.net/djvu/%{name}-%{version}.tar.gz
+Source0: https://downloads.sourceforge.net/djvu/%{name}-%{version}.tar.gz
 Patch0: djvulibre-3.5.22-cdefs.patch
 #Patch1: djvulibre-3.5.25.3-cflags.patch
 Patch2: djvulibre-3.5.27-buffer-overflow.patch
