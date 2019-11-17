@@ -1,5 +1,5 @@
 %global VER 6.9.10
-%global Patchlevel 67
+%global Patchlevel 69
 
 Name:		ImageMagick
 %if 0%{?fedora} >= 27
