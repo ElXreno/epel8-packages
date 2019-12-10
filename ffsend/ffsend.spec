@@ -9,6 +9,8 @@ Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 
 ExclusiveArch:  %{rust_arches}
 
+BuildRequires:  openssl-devel
+
 %description
 Easily and securely share files from the command line. A fully featured Firefox
 Send client.
