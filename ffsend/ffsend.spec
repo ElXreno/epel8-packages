@@ -1,3 +1,5 @@
+%global debug_package %{nil}
+
 Name:           ffsend
 Version:        0.2.57
 Release:        2%{?dist}
