@@ -16,7 +16,7 @@ zram_size=$((${mem_total} / ${factor} /1024))
 modprobe -q zram num_devices=1
 
 # Create ZRAM with first device, lz4 algorithm
-zramdev=$(zramctl --find --algorithm lz4 --size ${zram_size}MB 2>&1)
+zramdev=$(zramctl --find --size ${zram_size}MB 2>&1)
 # The above returns the device. Use it below
 mkswap $zramdev
 swapon -p $priority $zramdev
