@@ -1,8 +1,8 @@
 %global debug_package %{nil}
 
 Name:           ffsend
-Version:        0.2.57
-Release:        2%{?dist}
+Version:        0.2.58
+Release:        1%{?dist}
 Summary:        Easily and securely share files from the command line
 
 License:        GPLv3
@@ -62,5 +62,8 @@ install -Dpm0644 -t %{buildroot}%{_datadir}/zsh/site-functions \
 
 
 %changelog
+* Sat Feb 08 2020 ElXreno <elxreno@gmail.com> - 0.2.58-1
+- Update to version 0.2.58
+
 * Tue Dec 10 2019 ElXreno <elxreno@gmail.com> - 0.2.57-2
 - Rewrited spec file for CentOS 8 (stealed from here: https://src.fedoraproject.org/rpms/rust-ffsend)
