@@ -1,5 +1,5 @@
 %global VER 6.9.10
-%global Patchlevel 69
+%global Patchlevel 91
 
 Name:		ImageMagick
 %if 0%{?fedora} >= 27
@@ -15,19 +15,29 @@ Summary:	An X application for displaying and manipulating images
 
 License:	ImageMagick
 Url:		http://www.imagemagick.org/
-Source0:	https://www.imagemagick.org/download/%{name}-%{VER}-%{Patchlevel}.tar.xz
+Source0:	https://www.imagemagick.org/download/releases/%{name}-%{VER}-%{Patchlevel}.tar.xz
 
 Patch0:		ImageMagick-6.9.9-3-multiarch-implicit-pkgconfig-dir.patch
 
 BuildRequires:	bzip2-devel, freetype-devel, libjpeg-devel, libpng-devel
 BuildRequires:	libtiff-devel, giflib-devel, zlib-devel, perl-devel >= 5.8.1
-#BuildRequires:	perl-generators
+BuildRequires:	perl-generators
 %if 0%{?fedora} > 27
 BuildRequires:	libgs-devel, ghostscript-x11
 %else
 BuildRequires:	ghostscript-devel
 %endif
+%if 0%{?fedora}
+# These are not available in EPEL
+BuildRequires:  LibRaw-devel >= 0.14.8
 BuildRequires:	djvulibre-devel
+BuildRequires:  liblqr-1-devel
+%else
+%ifarch %{ix86} x86_64 %{power64}
+# not in EPEL aarch64/s390x
+BuildRequires:  LibRaw-devel >= 0.14.8
+%endif
+%endif
 BuildRequires:	libwmf-devel, jasper-devel, libtool-ltdl-devel
 BuildRequires:	libX11-devel, libXext-devel, libXt-devel
 BuildRequires:	lcms2-devel, libxml2-devel, librsvg2-devel
@@ -36,8 +46,6 @@ BuildRequires:	jbigkit-devel
 BuildRequires:	openjpeg2-devel >= 2.1.0
 BuildRequires:  graphviz-devel >= 2.9.0
 BuildRequires:  libraqm-devel
-BuildRequires:  liblqr-1-devel
-BuildRequires:  LibRaw-devel >= 0.14.8
 BuildRequires:	autoconf automake gcc gcc-c++
 
 Requires:	%{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
@@ -89,6 +97,7 @@ Summary: ImageMagick libraries to link with
 This packages contains a shared libraries to use within other applications.
 
 
+%if 0%{?fedora}
 %package djvu
 Summary: DjVu plugin for ImageMagick
 Requires: %{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
@@ -96,6 +105,7 @@ Requires: %{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
 %description djvu
 This packages contains a plugin for ImageMagick which makes it possible to
 save and load DjvU files from ImageMagick and libMagickCore using applications.
+%endif
 
 
 %package doc
@@ -183,17 +193,24 @@ export CFLAGS="%{optflags} -DIMPNG_SETJMP_IS_THREAD_SAFE"
 	--without-gcc-arch \
 	--with-jbig \
 	--with-openjp2 \
+%if 0%{?fedora}
 	--with-raw \
 	--with-lqr \
 	--with-gvc \
 	--with-raqm
+%else
+%ifarch %{ix86} x86_64 %{power64}
+	--with-raw \
+%endif
+	--with-gvc
+%endif
 
 # Do *NOT* use %%{?_smp_mflags}, this causes PerlMagick to be silently misbuild
-%make_build
+make
 
 
 %install
-%make_install
+make %{?_smp_mflags} install DESTDIR=%{buildroot} INSTALL="install -p"
 cp -a www/source %{buildroot}%{_datadir}/doc/%{name}-%{VER}
 # Delete *ONLY* _libdir/*.la files! .la files used internally to handle plugins - BUG#185237!!!
 rm %{buildroot}%{_libdir}/*.la
@@ -295,8 +312,10 @@ rm PerlMagick/demo/Generic.ttf
 %{_mandir}/man1/Wand-config.*
 %{_mandir}/man1/MagickWand-config.*
 
+%if 0%{?fedora}
 %files djvu
 %{_libdir}/%{name}-%{VER}/modules-Q16/coders/djvu.*
+%endif
 
 %files doc
 %doc %{_datadir}/doc/%{name}-6
@@ -325,8 +344,14 @@ rm PerlMagick/demo/Generic.ttf
 %doc PerlMagick/demo/ PerlMagick/Changelog PerlMagick/README.txt
 
 %changelog
-* Sun Oct 27 2019 ElXreno <elxreno@gmail.com> - 1:6.9.10.69-1
-- Update to 6.9.10.69 version
+* Sat Feb 08 2020 ElXreno <elxreno@gmail.com> - 1:6.9.10.91-1
+- Update to 6.9.10.91
+
+* Mon Jan 13 2020 Michael Cronenworth <mike@cchtml.com> - 1:6.9.10.86-1
+- Update to 6.9.10.86
+
+* Tue Nov 26 2019 Michael Cronenworth <mike@cchtml.com> - 1:6.9.10.75-1
+- Update to 6.9.10.75
 
 * Fri Oct 04 2019 Pete Walter <pwalter@fedoraproject.org> - 1:6.9.10.67-1
 - Update to 6.9.10.67
