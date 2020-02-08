@@ -1,5 +1,5 @@
 # This spec file has been automatically updated
-Version:        207
+Version:        212
 Release: 1%{?dist}
 #
 # This file is maintained at the following location:
@@ -164,9 +164,6 @@ touch dashboard.list
 echo '%dir %{_datadir}/cockpit/pcp' >> pcp.list
 find %{buildroot}%{_datadir}/cockpit/pcp -type f >> pcp.list
 
-echo '%dir %{_datadir}/cockpit/realmd' >> system.list
-find %{buildroot}%{_datadir}/cockpit/realmd -type f >> system.list
-
 echo '%dir %{_datadir}/cockpit/tuned' >> system.list
 find %{buildroot}%{_datadir}/cockpit/tuned -type f >> system.list
 
@@ -221,7 +218,7 @@ touch docker.list
 
 # when not building basic packages, remove their files
 %if 0%{?build_basic} == 0
-for pkg in base1 branding motd kdump networkmanager realmd selinux shell sosreport ssh static systemd tuned users; do
+for pkg in base1 branding motd kdump networkmanager selinux shell sosreport ssh static systemd tuned users; do
     rm -r %{buildroot}/%{_datadir}/cockpit/$pkg
     rm -f %{buildroot}/%{_datadir}/metainfo/org.cockpit-project.cockpit-${pkg}.metainfo.xml
 done
@@ -231,7 +228,7 @@ done
 for lib in systemd tmpfiles.d firewalld; do
     rm -r %{buildroot}/%{_prefix}/%{__lib}/$lib
 done
-for libexec in cockpit-askpass cockpit-session cockpit-ws cockpit-tls cockpit-desktop; do
+for libexec in cockpit-askpass cockpit-session cockpit-ws cockpit-tls cockpit-wsinstance-factory cockpit-desktop; do
     rm %{buildroot}/%{_libexecdir}/$libexec
 done
 rm -r %{buildroot}/%{_libdir}/security %{buildroot}/%{_sysconfdir}/pam.d %{buildroot}/%{_sysconfdir}/motd.d %{buildroot}/%{_sysconfdir}/issue.d
@@ -352,7 +349,6 @@ Requires: shadow-utils
 Requires: grep
 Requires: libpwquality
 Requires: /usr/bin/date
-Provides: cockpit-realmd = %{version}-%{release}
 Provides: cockpit-shell = %{version}-%{release}
 Provides: cockpit-systemd = %{version}-%{release}
 Provides: cockpit-tuned = %{version}-%{release}
@@ -368,6 +364,11 @@ Recommends: NetworkManager-team
 Recommends: setroubleshoot-server >= 3.3.3
 Provides: cockpit-selinux = %{version}-%{release}
 Provides: cockpit-sosreport = %{version}-%{release}
+%endif
+%if 0%{?fedora} >= 29
+# 0.7.0 (actually) supports task cancellation.
+# 0.7.1 fixes tasks never announcing completion.
+Recommends: (reportd >= 0.7.1 if abrt)
 %endif
 # NPM modules which are also available as packages
 Provides: bundled(js-jquery) = 3.4.1
@@ -390,6 +391,7 @@ Conflicts: firewalld < 0.6.0-1
 Recommends: sscg >= 2.3
 Recommends: system-logos
 Requires: systemd >= 235
+Suggests: sssd-dbus
 Requires(post): systemd
 Requires(preun): systemd
 Requires(postun): systemd
@@ -397,12 +399,16 @@ Requires(postun): systemd
 %description ws
 The Cockpit Web Service listens on the network, and authenticates users.
 
+If sssd-dbus is installed, you can enable client certificate/smart card
+authentication via sssd/FreeIPA.
+
 %files ws -f cockpit.lang
 %doc %{_mandir}/man1/cockpit-desktop.1.gz
 %doc %{_mandir}/man5/cockpit.conf.5.gz
 %doc %{_mandir}/man8/cockpit-ws.8.gz
 %doc %{_mandir}/man8/cockpit-tls.8.gz
 %doc %{_mandir}/man8/remotectl.8.gz
+%doc %{_mandir}/man8/pam_cockpit_cert.8.gz
 %doc %{_mandir}/man8/pam_ssh_add.8.gz
 %config(noreplace) %{_sysconfdir}/cockpit/ws-certs.d
 %config(noreplace) %{_sysconfdir}/pam.d/cockpit
@@ -425,6 +431,7 @@ The Cockpit Web Service listens on the network, and authenticates users.
 %{_prefix}/%{__lib}/tmpfiles.d/cockpit-tempfiles.conf
 %{_sbindir}/remotectl
 %{_libdir}/security/pam_ssh_add.so
+%{_libdir}/security/pam_cockpit_cert.so
 %{_libexecdir}/cockpit-ws
 %{_libexecdir}/cockpit-wsinstance-factory
 %{_libexecdir}/cockpit-tls
@@ -444,39 +451,6 @@ getent passwd cockpit-wsinstance >/dev/null || useradd -r -g cockpit-wsinstance 
 %systemd_post cockpit.socket
 # firewalld only partially picks up changes to its services files without this
 test -f %{_bindir}/firewall-cmd && firewall-cmd --reload --quiet || true
-
-%if 0%{?rhel} || 0%{?fedora} == 29
-# HACK: SELinux policy adjustment for cockpit-tls; see https://github.com/fedora-selinux/selinux-policy-contrib/pull/114
-if type semanage >/dev/null 2>&1; then
-    set -ex
-    echo "Applying SELinux policy change for cockpit-tls.."
-    semanage fcontext -a /usr/libexec/cockpit-tls -t cockpit_ws_exec_t
-    restorecon /usr/libexec/cockpit-tls
-    tmp=$(mktemp -d)
-    cat <<EOF > $tmp/local.te
-module local 1.0;
-require {
-    type cockpit_ws_t;
-    type cockpit_ws_exec_t;
-    class unix_stream_socket { create_stream_socket_perms connectto };
-    class file { execute_no_trans};
-}
-
-allow cockpit_ws_t cockpit_ws_t:unix_stream_socket { create_stream_socket_perms connectto };
-allow cockpit_ws_t cockpit_ws_exec_t:file { execute_no_trans };
-EOF
-    checkmodule -M -m -o $tmp/local.mod $tmp/local.te
-    semodule_package -o $tmp/local.pp -m $tmp/local.mod
-    semodule -i $tmp/local.pp
-    rm -rf "$tmp"
-fi
-%endif
-%if 0%{?rhel} || 0%{?fedora}
-# HACK: SELinux policy adjustment for cockpit-tls; see https://github.com/fedora-selinux/selinux-policy-contrib/pull/161
-    echo "Applying SELinux policy change for cockpit-wsinstance-factory..."
-    semanage fcontext -a /usr/libexec/cockpit-wsinstance-factory -t cockpit_ws_exec_t
-    restorecon /usr/libexec/cockpit-wsinstance-factory
-%endif
 
 %preun ws
 %systemd_preun cockpit.socket
@@ -686,6 +660,46 @@ via PackageKit.
 
 # The changelog is automatically generated and merged
 %changelog
+* Wed Feb 05 2020 sanne raymaekers <sanne.raymaekers@gmail.com> - 212-1
+
+- Per page documentation
+- Localize times
+
+* Sat Jan 25 2020 Martin Pitt <mpitt@redhat.com> - 211.1-1
+
+- system: Fix graph layout across all browsers (rhbz#1792623)
+- websocket: Fix unaligned access in send_prefixed_message_rfc6455()
+
+* Wed Jan 22 2020 Martin Pitt <mpitt@redhat.com> - 211-1
+
+- Better support for various TLS certificate formats
+- Switch from Zanata to Weblate
+- Overview layout optimizations
+
+* Wed Jan 08 2020 Katerina Koukiou <kkoukiou@redhat.com> - 210-1
+
+- Overview: Add CPU utilization to usage card
+- Dashboard: Support SSH identity unlocking when adding new machines
+- SElinux: Introduce an Ansible automation script
+- Machines: Support “bridge” type network interfaces
+- Machines: Support “bus” type disk configuration
+
+* Fri Dec 13 2019 Marius Vollmer <mvollmer@redhat.com> - 209-1
+
+- New overview design
+- Session timeouts
+- Banners on login screen
+- Client certificate authentication
+- Support for Fedora CoreOS
+- Dropped support for pam_rhost
+
+* Wed Nov 27 2019 Martin Pitt <mpitt@redhat.com> - 208-1
+
+- Storage: Drop “default mount point” concept
+- Machines: Support transient virtual networks and storage pools
+- Machines: Sliders for disk size and memory in VM creation
+- Logs: Improve crash reporting
+
 * Wed Nov 13 2019 Katerina Koukiou <kkoukiou@redhat.com> - 207-1
 
 - Web server: Accept EC certificates
